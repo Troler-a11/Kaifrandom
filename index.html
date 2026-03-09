@@ -6,180 +6,415 @@
     <title>kaifrandom 🤤</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --bg: #0b0f1a; --card: #161c2d; --accent: #22c55e; --gold: #facc15; --blue: #3b82f6; --text: #ffffff; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; user-select: none; }
-        
-        /* Намальований інтерфейс профілю */
-        .profile-card { background: linear-gradient(180deg, var(--card) 0%, var(--bg) 100%); padding: 25px; border-bottom: 2px solid var(--accent); text-align: center; border-radius: 0 0 30px 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .avatar { width: 90px; height: 90px; border-radius: 50%; border: 4px solid var(--accent); margin-bottom: 15px; filter: drop-shadow(0 0 10px var(--accent)); }
-        
-        .balance-row { display: flex; justify-content: center; gap: 15px; margin: 20px 0; }
-        .bal-item { background: rgba(255,255,255,0.05); padding: 10px 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); min-width: 100px; }
-        .bal-label { font-size: 12px; color: #94a3b8; margin-bottom: 5px; }
-        .bal-val { font-size: 18px; font-weight: bold; }
-        
-        /* Кнопки */
-        .btn { border: none; padding: 15px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-green { background: var(--accent); color: #000; box-shadow: 0 4px 15px rgba(34,197,94,0.4); }
-        .btn-blue { background: var(--blue); color: #fff; box-shadow: 0 4px 15px rgba(59,130,246,0.4); }
-        .btn:active { transform: scale(0.95); }
+        :root {
+            --bg: #090c14;
+            --card: #151a29;
+            --accent: #22c55e;
+            --gold: #facc15;
+            --danger: #ef4444;
+            --text: #ffffff;
+        }
 
-        /* Грид кейсів */
-        .cases-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; padding-bottom: 100px; }
-        .case-box { background: var(--card); border-radius: 20px; padding: 20px; border: 1px solid #2d3748; text-align: center; position: relative; overflow: hidden; }
-        .case-box::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); }
-        .case-img { font-size: 40px; margin-bottom: 10px; display: block; }
-        .case-price { color: var(--gold); font-weight: bold; display: block; margin-bottom: 15px; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            -webkit-user-select: none;
+        }
 
-        /* Камінь Ножиці Папір */
-        #rps-ui { display: none; padding: 20px; text-align: center; }
-        .rps-btn { font-size: 40px; padding: 20px; background: var(--card); border: 2px solid var(--accent); border-radius: 20px; margin: 10px; width: 80px; }
+        /* --- ІНТЕРФЕЙС ПРОФІЛЮ --- */
+        .header-profile {
+            background: linear-gradient(180deg, #1a2235 0%, var(--bg) 100%);
+            padding: 25px 15px;
+            text-align: center;
+            border-bottom: 2px solid var(--accent);
+            border-radius: 0 0 25px 25px;
+        }
 
-        /* Рулетка */
-        #roulette-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; flex-direction: column; }
-        .roulette-window { width: 300px; height: 100px; background: var(--card); border: 3px solid var(--gold); position: relative; overflow: hidden; display: flex; align-items: center; }
-        .roulette-track { display: flex; position: absolute; left: 0; transition: left 4s cubic-bezier(0.1, 0, 0, 1); }
-        .r-item { min-width: 100px; text-align: center; font-size: 24px; font-weight: bold; }
-        .pointer { position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: red; z-index: 2; }
+        .avatar-img {
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .balance-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .bal-card {
+            background: var(--card);
+            padding: 12px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .bal-label { font-size: 11px; color: #8892b0; margin-bottom: 4px; }
+        .bal-val { font-size: 16px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .cash-color { color: var(--accent); }
+
+        .btn-action {
+            width: 45%;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        /* --- ГРИД КЕЙСІВ --- */
+        .cases-container {
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding-bottom: 100px;
+        }
+
+        .case-item {
+            background: var(--card);
+            border-radius: 18px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #232d45;
+            transition: 0.2s;
+        }
+
+        .case-icon { font-size: 35px; display: block; margin-bottom: 8px; }
+        .case-name { font-size: 13px; font-weight: 600; color: #ccd6f6; display: block; }
+        .case-cost { color: var(--gold); font-size: 15px; font-weight: 800; margin: 8px 0; display: block; }
+
+        /* --- РУЛЕТКА --- */
+        #roulette-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .win-line {
+            width: 2px;
+            height: 120px;
+            background: var(--accent);
+            position: absolute;
+            left: 50%;
+            z-index: 10;
+        }
+
+        .spin-window {
+            width: 100%;
+            height: 100px;
+            background: #111827;
+            overflow: hidden;
+            position: relative;
+            border-y: 2px solid var(--gold);
+        }
+
+        .spin-track {
+            display: flex;
+            position: absolute;
+            left: 0;
+            align-items: center;
+            height: 100%;
+            transition: left 4s cubic-bezier(0.1, 0, 0, 1);
+        }
+
+        .mult-box {
+            min-width: 90px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--text);
+        }
+
+        /* --- КНП ЕКРАН --- */
+        #rps-screen {
+            display: none;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .rps-choice-btn {
+            font-size: 45px;
+            background: var(--card);
+            border: 2px solid var(--accent);
+            border-radius: 20px;
+            padding: 15px;
+            margin: 10px;
+            width: 90px;
+        }
+
+        /* --- ВИВІД --- */
+        #withdraw-screen { display: none; padding: 20px; }
+        .input-kaif {
+            width: 100%;
+            background: var(--card);
+            border: 1px solid #232d45;
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 18px;
+            margin: 15px 0;
+        }
+
+        .gender-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        .gender-btn { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #232d45; background: var(--card); color: white; }
+        .active-g { border-color: var(--gold); background: #1e293b; }
     </style>
 </head>
 <body>
 
-<div id="app">
-    <div class="profile-card">
-        <img id="u-avatar" class="avatar" src="https://via.placeholder.com/100">
-        <div id="u-name" style="font-size: 20px; font-weight: bold;">Гравець</div>
-        <div class="balance-row">
-            <div class="bal-item"><div class="bal-label">kaifkoin 🤤</div><div id="k-bal" class="bal-val">0</div></div>
-            <div class="bal-item"><div class="bal-label">kaifbablo 💵</div><div id="b-bal" class="bal-val" style="color: var(--accent);">0</div></div>
+<div id="main-ui">
+    <div class="header-profile">
+        <img id="p-avatar" class="avatar-img" src="https://via.placeholder.com/100">
+        <div id="p-name" style="font-weight: 800; font-size: 18px;">Завантаження...</div>
+        
+        <div class="balance-grid">
+            <div class="bal-card">
+                <div class="bal-label">kaifkoin 🤤</div>
+                <div id="k-bal" class="bal-val">0</div>
+            </div>
+            <div class="bal-card">
+                <div class="bal-label">kaifbablo 💵</div>
+                <div id="b-bal" class="bal-val cash-color">0</div>
+            </div>
         </div>
-        <button class="btn btn-green" onclick="tg.openInvoice('...')">Поповнити</button>
-        <button class="btn btn-blue" onclick="showSection('withdraw')">Вивести</button>
-    </div>
 
-    <div id="main-menu" style="padding: 20px; gap: 15px; display: flex; flex-direction: column;">
-        <button class="btn btn-blue" onclick="showSection('cases')">📦 Відкрити Кейси</button>
-        <button class="btn btn-green" style="background: #ef4444;" onclick="showSection('rps')">✂️ Камінь Ножиці Папір</button>
-    </div>
-
-    <div id="cases-ui" style="display:none;">
-        <h2 style="text-align: center;">Оберіть кейс</h2>
-        <div class="cases-grid" id="case-list"></div>
-        <button class="btn btn-blue" style="margin: 20px; width: calc(100% - 40px);" onclick="showSection('main')">Назад</button>
-    </div>
-
-    <div id="rps-ui">
-        <h2>Ставка: <input type="number" id="rps-bet" value="1000" style="background: none; border: 1px solid var(--accent); color: white; padding: 5px; width: 100px;"></h2>
-        <p id="rps-info">Раунд 1/3</p>
-        <div>
-            <button class="rps-btn" onclick="playRPS('rock')">🪨</button>
-            <button class="rps-btn" onclick="playRPS('paper')">📄</button>
-            <button class="rps-btn" onclick="playRPS('scissors')">✂️</button>
+        <button class="btn-action" style="background: var(--accent); color: black;" onclick="tg.openInvoice('topup')">ПОПОВНИТИ</button>
+        <button class="btn-action" style="background: #3b82f6; color: white;" onclick="openWithdraw()">ВИВЕСТИ</button>
+        
+        <div style="margin-top: 15px;">
+            <button class="btn-action" style="width: 93%; background: var(--danger); color: white;" onclick="openRPS()">🎮 КАМІНЬ НОЖИЦІ ПАПІР</button>
         </div>
-        <button class="btn btn-blue" onclick="showSection('main')">Вийти</button>
     </div>
 
-    <div id="withdraw-ui" style="display:none; padding: 20px;">
-        <h2>Вивід коштів</h2>
-        <p>Сума (мін. 1000):</p>
-        <input type="number" id="w-amount" style="width:100%; padding:15px; border-radius:10px; margin-bottom:20px;">
-        <p>Стать:</p>
-        <button class="btn" id="g-m" onclick="gen='boy'; this.style.border='2px solid gold'">Хлопець 👦</button>
-        <button class="btn" id="g-f" onclick="gen='girl'; this.style.border='2px solid gold'">Дівчина 👧</button>
-        <button class="btn btn-green" style="width:100%; margin-top:20px;" onclick="doWithdraw()">Вивести в ТГ</button>
-    </div>
+    <div class="cases-container" id="cases-grid"></div>
 </div>
 
-<div id="roulette-overlay">
-    <h2 id="r-status">Крутимо...</h2>
-    <div class="roulette-window">
-        <div class="pointer"></div>
-        <div class="roulette-track" id="r-track"></div>
+<div id="roulette-modal">
+    <h2 id="r-status" style="margin-bottom: 30px;">УДАЧІ! 🤞</h2>
+    <div class="spin-window">
+        <div class="win-line"></div>
+        <div class="spin-track" id="spin-track"></div>
     </div>
-    <button id="r-close" class="btn btn-blue" style="margin-top:20px; display:none;" onclick="document.getElementById('roulette-overlay').style.display='none'">Забрати</button>
+    <button id="r-close" class="btn-action" style="display:none; width: 200px; background: var(--accent); margin-top: 40px;" onclick="closeRoulette()">ЗАБРАТИ</button>
+</div>
+
+<div id="rps-screen">
+    <h1 style="color: var(--gold);">KAIF-RPS</h1>
+    <div class="bal-card" style="margin-bottom: 20px;">
+        <p id="rps-round">РАУНД 1 / 3</p>
+        <h3>СТАВКА: <input type="number" id="rps-bet" value="1000" min="1000" class="input-kaif" style="width: 120px; padding: 5px; text-align: center;"></h3>
+    </div>
+    <div id="rps-actions">
+        <button class="rps-choice-btn" onclick="playRPS('rock')">🪨</button>
+        <button class="rps-choice-btn" onclick="playRPS('paper')">📄</button>
+        <button class="rps-choice-btn" onclick="playRPS('scissors')">✂️</button>
+    </div>
+    <button class="btn-action" style="background: grey; margin-top: 30px;" onclick="location.reload()">НАЗАД</button>
+</div>
+
+<div id="withdraw-screen">
+    <h2>ВИВІД ПОДАРУНКАМИ 🎁</h2>
+    <p>Мінімум 1000. Система автоматично підбере подарунки по 100, 50, 25, 15.</p>
+    <input type="number" id="w-sum" placeholder="Сума..." class="input-kaif">
+    
+    <p>Оберіть стать (для типу подарунків):</p>
+    <div class="gender-box">
+        <button class="gender-btn" id="g-boy" onclick="setGender('boy')">ХЛОПЧИК 👦</button>
+        <button class="gender-btn" id="g-girl" onclick="setGender('girl')">ДІВЧИНКА 👧</button>
+    </div>
+    
+    <button class="btn-action" style="width: 100%; background: var(--accent); color: black;" onclick="confirmWithdraw()">ПІДТВЕРДИТИ ВИВІД</button>
+    <button class="btn-action" style="width: 100%; background: grey; margin-top: 10px;" onclick="location.reload()">СКАСУВАТИ</button>
 </div>
 
 <script>
     let tg = window.Telegram.WebApp;
     tg.expand();
-    
-    let kBal = 10000;
-    let bBal = 0;
-    let rpsR = 1, pW = 0, bW = 0, gen = null;
 
-    // Генерація 70 кейсів
-    const caseData = [];
-    const pSteps = [30, 44, 56, 79, 89];
-    for(let i=100; i<=100000; i+=1500) pSteps.push(i);
-    
-    pSteps.forEach((p, i) => {
-        caseData.push({ id: i, price: p, max: p < 1000 ? 1.5 : (p < 5000 ? 5 : 50) });
+    let koinBal = 5000; // Початковий для тесту
+    let babloBal = 0;
+    let selectedGender = null;
+    let rpsRound = 1, pWins = 0, bWins = 0;
+
+    // --- ГЕНЕРАЦІЯ 70+ КЕЙСІВ ---
+    const caseList = [];
+    const prices = [30, 44, 56, 79, 89];
+    for(let p=100; p<=100000; p += 1500) prices.push(p);
+
+    prices.forEach((price, i) => {
+        caseList.push({
+            id: i,
+            name: price < 100 ? `Початковий #${i+1}` : (price < 5000 ? `Кейс Кабанчика` : `VIP Шейх`),
+            cost: price,
+            maxMult: price < 100 ? 1.5 : (price < 10000 ? 10 : 50)
+        });
     });
 
-    const list = document.getElementById('case-list');
-    caseData.forEach(c => {
-        const d = document.createElement('div');
-        d.className = 'case-box';
-        d.innerHTML = `<span class="case-img">📦</span><span class="case-price">${c.price} 🤤</span><button class="btn btn-green" style="padding:8px; font-size:12px;" onclick="openC(${c.id})">ВІДКРИТИ</button>`;
-        list.appendChild(d);
+    const grid = document.getElementById('cases-grid');
+    caseList.forEach(c => {
+        grid.innerHTML += `
+            <div class="case-item">
+                <span class="case-icon">📦</span>
+                <span class="case-name">${c.name}</span>
+                <span class="case-cost">${c.cost} 🤤</span>
+                <button onclick="startSpin(${c.id})" style="background:var(--accent); border:none; border-radius:8px; padding:5px 15px; font-weight:bold;">ВІДКРИТИ</button>
+            </div>
+        `;
     });
 
-    function showSection(s) {
-        ['main-menu', 'cases-ui', 'rps-ui', 'withdraw-ui'].forEach(id => document.getElementById(id).style.display='none');
-        document.getElementById(s+'-ui' || 'main-menu').style.display='block';
-        if(s === 'main') document.getElementById('main-menu').style.display='flex';
-    }
+    // --- ЛОГІКА РУЛЕТКИ ---
+    function startSpin(id) {
+        const c = caseList[id];
+        if(koinBal < c.cost) return alert("Недостатньо kaifkoin! 🤤");
+        
+        koinBal -= c.cost;
+        updateUI();
 
-    function update() {
-        document.getElementById('k-bal').innerText = kBal;
-        document.getElementById('b-bal').innerText = bBal;
-    }
+        const track = document.getElementById('spin-track');
+        track.style.transition = 'none';
+        track.style.left = '0px';
+        track.innerHTML = '';
 
-    function openC(id) {
-        let c = caseData[id];
-        if(kBal < c.price) return alert("Мало коінів!");
-        kBal -= c.price; update();
-
-        let track = document.getElementById('r-track');
-        track.style.left = '0px'; track.innerHTML = '';
-        let items = [];
-        for(let i=0; i<50; i++) {
-            let mult = (Math.random() * c.max).toFixed(1);
-            items.push(mult);
-            track.innerHTML += `<div class="r-item">x${mult}</div>`;
+        const items = [];
+        for(let i=0; i<60; i++) {
+            let m;
+            const rnd = Math.random() * 100;
+            // Твоя логіка шансів: чим дорожче, тим менший шанс на х0
+            if(c.cost < 100) {
+                if(rnd < 40) m = (Math.random() * 0.9).toFixed(1);
+                else if(rnd < 90) m = 1.0;
+                else m = (1.1 + Math.random() * 0.4).toFixed(1);
+            } else {
+                if(rnd < 20) m = (Math.random() * 0.5).toFixed(1);
+                else if(rnd < 50) m = (1.1 + Math.random() * 2).toFixed(1);
+                else m = (Math.random() * c.maxMult).toFixed(1);
+            }
+            items.push(m);
+            track.innerHTML += `<div class="mult-box">x${m}</div>`;
         }
 
-        document.getElementById('roulette-overlay').style.display='flex';
-        document.getElementById('r-close').style.display='none';
+        document.getElementById('roulette-modal').style.display = 'flex';
         
         setTimeout(() => {
-            track.style.left = '-4250px'; 
+            track.style.transition = 'left 4s cubic-bezier(0.1, 0, 0, 1)';
+            const finalPos = -(50 * 90) + (window.innerWidth / 2) - 45;
+            track.style.left = finalPos + 'px';
+            
             setTimeout(() => {
-                let win = Math.floor(c.price * parseFloat(items[42]));
-                bBal += win; update();
-                document.getElementById('r-status').innerText = `Виграш: ${win} 💵`;
-                document.getElementById('r-close').style.display='block';
+                const winMult = parseFloat(items[50]);
+                const winAmt = Math.floor(c.cost * winMult);
+                babloBal += winAmt;
+                updateUI();
+                document.getElementById('r-status').innerText = `ВИПАЛО: x${winMult} (+${winAmt} 💵)`;
+                document.getElementById('r-close').style.display = 'block';
             }, 4100);
-        }, 100);
+        }, 50);
     }
 
+    // --- РОЗУМНИЙ КНП ---
     function playRPS(pMove) {
-        let bet = parseInt(document.getElementById('rps-bet').value);
-        if(bet < 1000 || kBal < bet) return alert("Перевір ставку/баланс!");
-        
-        const moves = ['rock', 'paper', 'scissors'];
-        const beats = {rock:'scissors', paper:'rock', scissors:'paper'};
-        const loses = {rock:'paper', paper:'scissors', scissors:'rock'};
+        const bet = parseInt(document.getElementById('rps-bet').value);
+        if(bet < 1000 || koinBal < bet) return alert("Мінімальна ставка 1000 або мало коінів!");
+
+        const beats = { rock: 'scissors', paper: 'rock', scissors: 'paper' };
+        const loses = { rock: 'paper', paper: 'scissors', scissors: 'rock' };
         
         let bMove;
-        if(rpsR < 3) {
-            bMove = (Math.random() < 0.3) ? loses[pMove] : (Math.random() < 0.5 ? pMove : beats[pMove]);
+        const dryWin = Math.random() < 0.3; // 30% бот виграє всуху
+
+        if(rpsRound < 3) {
+            if(dryWin) bMove = loses[pMove]; // Бот контрить
+            else bMove = Math.random() < 0.5 ? beats[pMove] : loses[pMove]; // Дає надію
         } else {
-            bMove = (Math.random() < 0.93) ? loses[pMove] : beats[pMove];
+            // Фінальний раунд: 93% бот бачить хід і виграє
+            bMove = Math.random() < 0.93 ? loses[pMove] : beats[pMove];
         }
 
-        if(pMove === bMove) return alert("Нічия! Переграємо раунд.");
-        if(bMove === beats[pMove]) pW++; else bW++;
+        if(pMove === bMove) return alert("Нічия в раунді! Переграємо.");
+        
+        if(bMove === beats[pMove]) pWins++; else bWins++;
 
-        if(pW==2 || bW==2 || rpsR==3) {
-            if(pW > bW) {
+        if(pWins === 2 || bWins === 2 || rpsRound === 3) {
+            if(pWins > bWins) {
+                const win = Math.floor(bet * 1.5);
+                babloBal += win;
+                alert(`НЕЙМОВІРНО! Ти переміг бота і виграв ${win} 💵`);
+            } else {
+                koinBal -= bet;
+                alert("Бот виграв. Всі коіни згоріли! 😈");
+            }
+            pWins = 0; bWins = 0; rpsRound = 1; updateUI();
+            location.reload();
+        } else {
+            rpsRound++;
+            document.getElementById('rps-round').innerText = `РАУНД ${rpsRound} / 3`;
+        }
+    }
+
+    // --- ЛОГІКА ВИВОДУ ---
+    function confirmWithdraw() {
+        const amt = parseInt(document.getElementById('w-sum').value);
+        if(amt < 1000 || babloBal < amt) return alert("Сума замала або недостатньо бабла!");
+        if(!selectedGender) return alert("Оберіть стать!");
+
+        babloBal -= amt;
+        updateUI();
+
+        let rem = amt;
+        let report = "ВИВІД:\n";
+        [100, 50, 25, 15].forEach(v => {
+            const count = Math.floor(rem / v);
+            if(count > 0) report += `Подарунок ${v}: ${count} шт.\n`;
+            rem %= v;
+        });
+
+        if(rem > 0) report += `\n🔥 Згоріло (менше 15): ${rem} 🤤`;
+        
+        alert(report);
+        tg.sendData(JSON.stringify({ action: "withdraw", gender: selectedGender, sum: amt }));
+        location.reload();
+    }
+
+    // --- СЕРВІСНІ ФУНКЦІЇ ---
+    function updateUI() {
+        document.getElementById('k-bal').innerText = koinBal;
+        document.getElementById('b-bal').innerText = babloBal;
+    }
+
+    function setGender(g) {
+        selectedGender = g;
+        document.getElementById('g-boy').classList.remove('active-g');
+        document.getElementById('g-girl').classList.remove('active-g');
+        document.getElementById('g-'+g).classList.add('active-g');
+    }
+
+    function openRPS() { document.getElementById('main-ui').style.display='none'; document.getElementById('rps-screen').style.display='block'; }
+    function openWithdraw() { document.getElementById('main-ui').style.display='none'; document.getElementById('withdraw-screen').style.display='block'; }
+    function closeRoulette() { document.getElementById('roulette-modal').style.display='none'; }
+
+    window.onload = () => {
+        const u = tg.initDataUnsafe?.user;
+        if(u) {
+            document.getElementById('p-name').innerText = u.first_name;
+            document.getElementById('p-avatar').src = u.photo_url || 'https://via.placeholder.com/100';
+        }
+        updateUI();
+    };
+</script>
+</body>
+</html>
